@@ -451,3 +451,12 @@
 - 差异项：① QA F3 所指 `start.ps1` 即 `windows/start.ps1`（`windows/app/` 下无此文件），已在 QA §九收窄登记，结论不受影响；② Windows 远端 tag `win-v1-rc` 无法在本仓 `git tag -l`／`git remote -v`（仅 `Video2Obsidian-Mac`）复核，记为未独立验证项。
 - 清理：删 `windows/` 下 **13 个 `__pycache__`**（`app/`×1＋`src/`×12，Stage4 自测运行产物）＋仓根 **1 个 `.DS_Store`**；复查 `find`（排除 `.git`／`.venv`）输出为空。`.venv/` 未动。未删任何业务/文档文件。
 - 未决：① Windows 远端 `Video2Obsidian-Windows` 的 `win-v1-rc` 是否在位待 TM／用户在可联网侧确认；② Windows 11 真机 15 项（`windows/docs/WINDOWS-HANDOFF.md` §二）零推断，待真机；③ reviewer P3×3＋知晓级 2 条＋reapply 口径顺文案（见 §一.8 挂账）待排期。
+
+---
+
+## 收尾记一笔（neat-freak，2026-10-05 README 截图换新轮）
+
+- 范围：README 首屏截图 `docs/screenshots/console.png` 换为干净空主页（1440×1498，Chrome headless 实拍、空任务列表），commit `354be1a` 已按用户指令 push `main`，GitHub 线上已确认（live verified）；双语 README 引用路径不变，全仓除 `docs/templates/归位表.md` 对 `mig2026-09-13-*.png` 的既有引用外无其他旧截图引用。**未改业务代码、未改规则文件正文。**
+- 清理：删 9 个无引用备份（`*.旧版-2026-10-03` ×8 ＋ `USER_MODEL_OVERRIDE.md.bak-20260924`，均确认现行同名文件在位、全仓零引用）；`GOVERNANCE-STATE.json` `task_ledger_rows` 63→64（对齐账本当前 64 行，状态表落后自决修正）。
+- 门禁：`node scripts/model/check-ledger.mjs docs/model` → `LEDGER-OK (含 WARN)`；README 链接目标（`docs/usage.md`、`docs/troubleshooting.md`、`windows/README.md`）均存在，中英 README 同步改动。
+- 未决（本轮不动，待用户/TM）：① 治理同步遗留 **12 项 M＋4 项 untracked 未提交**（`AGENTS.md`、`README*.md` 技术栈/目录段、`docs/roles/*`、`docs/prompts/*`、`scripts/*`、`.project.yaml`、`docs/sop/background-services.md`、`USER_MODEL_OVERRIDE.md` symlink 类型变更 T）——commit/push 属红线④需用户授权；② 根目录 3 个 tracked `*.旧版-2026-09-29` 备份（`AGENTS.md`／`经验一句话`／`外部开发者提示词`）删除＝改已提交内容，列删除候选待确认；③ 账本 6 条既有 `model` 写法 WARN（`deepseek-v4.1-flash`×5＋`unknown`×1）未修——不编造，需原记录人补精确 ID。
