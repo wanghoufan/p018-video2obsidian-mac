@@ -100,6 +100,29 @@ See [Usage](./docs/usage.md) for details.
 
 For full behavior see [Usage](./docs/usage.md); for errors see [Troubleshooting](./docs/troubleshooting.md).
 
+## Tech stack
+
+- **Backend**: Python 3.12. The console itself uses only the standard library (`http.server`, `json`, `threading`, `urllib`, `sqlite3`), so no extra `pip install` is needed for it.
+- **Frontend**: a single `index.html` with vanilla JavaScript (localStorage for preferences); no framework, no build step.
+- **Transcription engine**: `mlx-whisper` (Apple Silicon MLX backend, local inference, no cloud API).
+- **Audio extraction**: the `ffmpeg` CLI.
+- **File watching**: `watchdog`.
+- **Storage**: SQLite (jobs and run state, at `data/state.db` under the data directory) plus JSON manifest files.
+
+## Directory structure
+
+```text
+.
+├── app/          # Local console: server.py (backend), index.html (frontend), start.sh (launcher), presets/ (vocabulary presets)
+├── src/          # Transcription pipeline (stage1–stage12: watch, transcribe, draft, publish, archive, etc.)
+├── tests/        # Self-test scripts
+├── docs/         # Usage, troubleshooting, screenshots, plus pm/review/qa/handoff development records
+├── windows/      # Windows 11 port (in development, unreleased, pending real-machine verification; see windows/README.md)
+└── scripts/      # Development orchestration helper scripts
+```
+
+Regular users only need `app/` plus `docs/usage.md` and `docs/troubleshooting.md`.
+
 ## Documentation
 
 - [Usage](./docs/usage.md)
@@ -109,7 +132,7 @@ For full behavior see [Usage](./docs/usage.md); for errors see [Troubleshooting]
 
 ## Known limitations
 
-- The target device is Apple Silicon Mac. Other platforms are not verified in this repository.
+- The target device is Apple Silicon Mac. A Windows 11 port is developed separately under `windows/` (**in development, unreleased**, pending real-machine verification); see [windows/README.md](./windows/README.md).
 - Without `mlx_whisper` or `ffmpeg`, transcription is unavailable; the console reports it explicitly. Besides `mlx-whisper`, `watchdog` is also required (this repository ships no dependency manifest).
 - Watch state is lost on restart; press start again in the page after the service restarts.
 - Long real-world videos are still under acceptance testing. The pipeline guarantees it keeps running, not word-level accuracy.

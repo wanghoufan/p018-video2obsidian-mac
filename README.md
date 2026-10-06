@@ -100,6 +100,29 @@ stage0bench/bin/python → .venv/bin/python → venv/bin/python → python3
 
 完整字段与行为见 [使用说明](./docs/usage.md)，出问题先看 [故障排查](./docs/troubleshooting.md)。
 
+## 技术栈
+
+- **后端**：Python 3.12。控制台本体只用标准库（`http.server` / `json` / `threading` / `urllib` / `sqlite3` 等），无需额外 `pip install`。
+- **前端**：单个 `index.html` ＋ 原生 JavaScript（用 localStorage 记住页面偏好），无框架、无构建步骤。
+- **转写引擎**：`mlx-whisper`（Apple Silicon 的 MLX 后端，本机推理，不调云 API）。
+- **音频提取**：`ffmpeg` 命令行工具。
+- **文件监听**：`watchdog`。
+- **存储**：SQLite（任务与运行状态，位于数据目录 `data/state.db`）＋ JSON 清单文件。
+
+## 目录结构
+
+```text
+.
+├── app/          # 本机控制台：server.py（后端）、index.html（前端）、start.sh（启动脚本）、presets/（词库预设）
+├── src/          # 转写流水线（stage1–stage12：监听、转写、成稿、入库、归档等）
+├── tests/        # 自测脚本
+├── docs/         # 使用说明、故障排查、截图，以及 pm/review/qa/handoff 开发记录
+├── windows/      # Windows 11 版（开发中，未发布，真机待验；见 windows/README.md）
+└── scripts/      # 开发用编排辅助脚本
+```
+
+普通使用者只需要看 `app/` 和 `docs/usage.md`、`docs/troubleshooting.md`。
+
 ## 详细文档
 
 - [使用说明](./docs/usage.md)
@@ -109,7 +132,7 @@ stage0bench/bin/python → .venv/bin/python → venv/bin/python → python3
 
 ## 已知限制
 
-- 目标设备是 Apple Silicon Mac，其他平台当前仓库未能验证。
+- 目标设备是 Apple Silicon Mac。Windows 11 版在 `windows/` 目录独立开发（**开发中，未发布**，真机待验），见 [windows/README.md](./windows/README.md)。
 - 缺 `mlx_whisper` 或 `ffmpeg` 时转写不可用，控制台会明确报错，需要先补好环境。依赖除 `mlx-whisper` 外还需 `watchdog`（本仓库暂无依赖清单文件）。
 - 服务重启后监听状态不会自动恢复，需要在页面手动重新开始监听。
 - 真实长视频的端到端表现仍在验收中；转写流程保证不断不断流，不保证词级准确率。
