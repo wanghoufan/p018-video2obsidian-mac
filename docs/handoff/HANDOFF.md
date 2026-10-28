@@ -460,3 +460,14 @@
 - 清理：删 9 个无引用备份（`*.旧版-2026-10-03` ×8 ＋ `USER_MODEL_OVERRIDE.md.bak-20260924`，均确认现行同名文件在位、全仓零引用）；`GOVERNANCE-STATE.json` `task_ledger_rows` 63→64（对齐账本当前 64 行，状态表落后自决修正）。
 - 门禁：`node scripts/model/check-ledger.mjs docs/model` → `LEDGER-OK (含 WARN)`；README 链接目标（`docs/usage.md`、`docs/troubleshooting.md`、`windows/README.md`）均存在，中英 README 同步改动。
 - 未决（本轮不动，待用户/TM）：① 治理同步遗留 **12 项 M＋4 项 untracked 未提交**（`AGENTS.md`、`README*.md` 技术栈/目录段、`docs/roles/*`、`docs/prompts/*`、`scripts/*`、`.project.yaml`、`docs/sop/background-services.md`、`USER_MODEL_OVERRIDE.md` symlink 类型变更 T）——commit/push 属红线④需用户授权；② 根目录 3 个 tracked `*.旧版-2026-09-29` 备份（`AGENTS.md`／`经验一句话`／`外部开发者提示词`）删除＝改已提交内容，列删除候选待确认；③ 账本 6 条既有 `model` 写法 WARN（`deepseek-v4.1-flash`×5＋`unknown`×1）未修——不编造，需原记录人补精确 ID。
+
+## 治理规则更新通知 · 2026-10-17
+- **发生了什么**：本项目的治理文件（`AGENTS.md`／角色卡／README／编排者提示词／`scripts/*`）于 2026-10-17 被母版编排者批量铺包更新到最新版。
+- **为什么**：母版当天做了一轮体系修订（触发口令改名为「你是主开发者」、复核粒度改为「交付单元」、子代理模型与执行层/判定层分界、
+  账本新增若干机器门等）。铺包时本项目的旧文件已按惯例备份为同目录的 `*.旧版-2026-10-17`，**未删除任何文件、账本内容零改动**。
+- **对你意味着什么**：不需要你做任何操作；下次开工时你读到的 `AGENTS.md` 即为新规则。
+  其中影响执行方式的三条：①口令是「你是主开发者」（旧口令「你是唯一开发者」仍可用）；
+  ②复核链**不再对每个小任务跑**，改为对「交付单元」（阶段收口）跑一次；
+  ③若你的客户端支持派子代理时传 model/强度，执行层子代理**一律用 `opencode-go/deepseek-v4.1-flash`**（真机取证走 `codex/gpt-6-luna`）。
+- **需要你确认的**：若本次铺包覆盖了你项目里**自己改过的同名治理文件**，请对照同目录的 `*.旧版-2026-10-17` 备份，把你的专属条款合并回去。
+- **回退方式**（如需）：把对应的 `*.旧版-2026-10-17` 改回原名即可。
