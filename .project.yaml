@@ -2,11 +2,11 @@
 project_id: P018
 name_zh: 视频转 Obsidian Mac
 slug: video2obsidian-mac
-status: ing
+status: paused
 github: wanghoufan/p018-video2obsidian-mac
 visibility: public
 created_at: 2026-09-11T00:00:00+08:00  # GitHub 建仓日（回填时取自 API）
-local_path: /Users/zzymima0000/Developer/coding/1.Active/018-ing-本地视频转文字工具
+local_path: /Users/zzymima0000/Developer/coding/1.Active/018-paused-本地视频转文字工具
 default_branch: main
 repo_role: primary
 lifecycle: [ing, paused, done, archived]
