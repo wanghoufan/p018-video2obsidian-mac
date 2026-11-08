@@ -1,12 +1,14 @@
-# Video to Obsidian
+# Lazy Notes · Local Video to Obsidian
 
 Drop course, meeting, and interview videos into a queue; they are transcribed on your Mac and turned into Markdown notes inside your Obsidian vault—fully offline, no uploads.
 
 [简体中文](./README.md)
 
+![Lazy Notes local console on first launch](docs/images/console.png)
+
 ## What it is
 
-A local transcription pipeline for Apple Silicon Macs, with a console page bound only to `127.0.0.1:8765`.
+A local transcription pipeline for Apple Silicon Macs, with a console page bound only to `127.0.0.1:8899`.
 
 It breaks "process a pile of videos" into a resumable pipeline: discover → extract audio → Whisper transcription → compose the note → write to Obsidian. Failed tasks never disappear silently, and notes you have edited are never overwritten.
 
@@ -29,7 +31,7 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install mlx-whisper          # install any remaining dependencies per docs
 ./app/start.sh                   # start the console
-open http://127.0.0.1:8765/
+open http://127.0.0.1:8899/
 ```
 
 Choose a source folder and an Obsidian target folder in the console, confirm, and add to the queue. Real video folders and vaults are only read/write targets; the repository contains no media or notes.

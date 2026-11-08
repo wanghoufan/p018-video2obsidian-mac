@@ -1,12 +1,14 @@
-# 本地视频转文字工具 · Video to Obsidian
+# 懒得笔记 · 本地视频转文字
 
 把课程、会议、采访的视频丢进队列，本机转写成文字并整理成 Markdown 笔记，直接写进 Obsidian 库——全程离线，不上传素材。
 
 [English](./README.en.md)
 
+![懒得笔记的本机控制台（首次打开、尚未建立任务）](docs/images/console.png)
+
 ## 这是什么
 
-一个在 Apple Silicon Mac 上跑的本地转写流水线，带一个只监听 `127.0.0.1:8765` 的控制台页面。
+一个在 Apple Silicon Mac 上跑的本地转写流水线，带一个只监听 `127.0.0.1:8899` 的控制台页面。
 
 它把「批量处理一堆视频」拆成可恢复的流水线：发现文件 → 抽取音频 → Whisper 转写 → 整理成稿 → 写入 Obsidian。中途失败的任务不会悄悄消失，也不会覆盖你已经改好的笔记。
 
@@ -29,7 +31,7 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install mlx-whisper          # 另按 docs 安装其余依赖
 ./app/start.sh                   # 启动控制台
-open http://127.0.0.1:8765/
+open http://127.0.0.1:8899/
 ```
 
 在控制台里选择源目录与 Obsidian 目标目录，确认后加入队列即可。真实视频目录与 Obsidian 库只作为读取/写入目标，仓库内不包含任何素材或笔记。
