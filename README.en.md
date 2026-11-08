@@ -1,144 +1,64 @@
-# 懒得笔记 (Video2Obsidian) — Turn Local Videos into Obsidian Notes
+# Video to Obsidian
 
-> Drop videos into a folder and get text notes as Markdown, all on your local Mac.
+Drop course, meeting, and interview videos into a queue; they are transcribed on your Mac and turned into Markdown notes inside your Obsidian vault—fully offline, no uploads.
 
-[简体中文](./README.md) | English
+[简体中文](./README.md)
 
-![Local console](./docs/screenshots/console.png)
+## What it is
 
-## What is this?
+A local transcription pipeline for Apple Silicon Macs, with a console page bound only to `127.0.0.1:8765`.
 
-懒得笔记 (Video2Obsidian) watches a video folder on your Mac, transcribes new videos locally, fixes known wrong words, splits the text into readable paragraphs, and saves the result as Markdown.
+It breaks "process a pile of videos" into a resumable pipeline: discover → extract audio → Whisper transcription → compose the note → write to Obsidian. Failed tasks never disappear silently, and notes you have edited are never overwritten.
 
-If you provide an Obsidian vault directory, notes are written there mirroring the video folder structure. If you leave it empty, notes stay in the data directory and your existing vault is untouched. Source videos are archived separately. No cloud API calls are required, so there is no API cost.
+## What it does
 
-## Key features
+- **Batch queue**: add multiple local audio/video files and watch per-task progress and state.
+- **On-device transcription**: `mlx_whisper` runs locally on Apple Silicon; no cloud endpoint.
+- **Markdown output**: transcripts are composed into a structured note and written to the chosen Obsidian folder.
+- **No-Clobber**: existing target notes are not overwritten by default; conflicts are surfaced before any decision.
+- **Explainable failures**: environment missing, unreadable media, transcription error, composition error, vault write blocked, conflict, and transient errors are classified separately instead of all being retried the same way.
+- **Resumable**: task state is persisted, so restarting the console continues rather than starting over.
+- **Live console**: a plain web page showing listener state, current tasks, blocked tasks, recovery/retry, and completed history.
 
-- **Watch-and-process**: fill in a video folder, press start, then drop files in. Jobs queue in the background; you do not need to keep watching the page.
-- **Local transcription**: uses `mlx-whisper` in your local Python environment, with `ffmpeg` extracting audio first.
-- **Word fixes**: maintain “wrong word → correct word” pairs (names, terms) in the console. New transcripts apply them automatically; existing results can be re-run.
-- **Draft and publish**: transcripts become paragraph-style Markdown. With a vault directory set, files mirror into Obsidian; without it, the run stops at render (a deliberate `RENDER_ONLY` outcome).
-- **Visible jobs with retry**: the job list shows Discover → Transcribe → Tidy → Draft → Publish progress. Failed jobs can be retried, previewed, and opened in Finder or Obsidian.
+## Run it
 
-## Who is it for?
-
-- Obsidian users with course recordings, meeting recordings, or interview footage to turn into text.
-- People who prefer to keep video and text on their own machine instead of uploading to a cloud service.
-- Users on Apple Silicon Mac who can prepare the required Python transcription environment.
-
-## Quick start
-
-Run from the repository root:
+Requires an Apple Silicon Mac, Python 3.12, and `ffmpeg` (`brew install ffmpeg`).
 
 ```bash
-./app/start.sh
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install mlx-whisper          # install any remaining dependencies per docs
+./app/start.sh                   # start the console
+open http://127.0.0.1:8765/
 ```
 
-The browser opens automatically at:
+Choose a source folder and an Obsidian target folder in the console, confirm, and add to the queue. Real video folders and vaults are only read/write targets; the repository contains no media or notes.
 
-```text
-http://127.0.0.1:8899/
-```
-
-Then, in order:
-
-1. Fill in the **video folder** (required, absolute local path).
-2. Fill in the **vault directory** (optional; transcription still works when empty).
-3. Press **Start watching**, then copy video files into the video folder.
-
-Click a row in the job list to read the finished note.
-
-## Installation
-
-### Requirements
-
-- Apple Silicon Mac.
-- Python 3.12 with `import mlx_whisper` working.
-- `ffmpeg` installed locally (used to extract audio before transcription).
-- An Obsidian vault directory is optional.
-
-The console backend itself uses only the Python standard library, so it needs no extra `pip install`. Transcription depends on a virtualenv you have already prepared.
-
-### How startup works
-
-`start.sh` picks Python in this order:
-
-```text
-stage0bench/bin/python -> .venv/bin/python -> venv/bin/python -> python3
-```
-
-- With `mlx_whisper`: transcription is available.
-- Without it: the console still opens, but starting a job returns `400 PRECHECK_MLX_MISSING`. Switch to the right Python and restart.
-
-The port defaults to `127.0.0.1:8899` and only listens locally; to change it, override with the `V2O_PORT` environment variable (`app/start.sh` passes it through to `app/server.py`).
-
-## Usage
-
-### Minimal path
+### Tests
 
 ```bash
-./app/start.sh
-# Open http://127.0.0.1:8899/
-# Fill video folder -> Start watching -> Drop videos in -> Check the job list
+python3 -m pytest tests
 ```
 
-Accepted input suffixes (as implemented in the console): `.mp4` `.mov` `.mkv` `.m4a` `.mp3` `.wav`.
+## Data and privacy
 
-### Word fixes
-
-Add one “wrong → correct” pair in the vocabulary area to affect new transcripts. Re-run existing results to apply updated pairs.
-
-See [Usage](./docs/usage.md) for details.
-
-## Configuration
-
-| Field in the page | Required | Notes |
-| --- | --- | --- |
-| Video folder | Yes | Absolute local path to watch. Pasted quoted paths have quotes stripped automatically. |
-| Vault directory | No | When empty, notes stay in the data directory and Obsidian is untouched. |
-| Data directory | No | Advanced. Defaults under the OS temp directory (e.g. `/tmp/v2o-console-data`) so test runs do not pollute a real vault. |
-
-For full behavior see [Usage](./docs/usage.md); for errors see [Troubleshooting](./docs/troubleshooting.md).
-
-## Tech stack
-
-- **Backend**: Python 3.12. The console itself uses only the standard library (`http.server`, `json`, `threading`, `urllib`, `sqlite3`), so no extra `pip install` is needed for it.
-- **Frontend**: a single `index.html` with vanilla JavaScript (localStorage for preferences); no framework, no build step.
-- **Transcription engine**: `mlx-whisper` (Apple Silicon MLX backend, local inference, no cloud API).
-- **Audio extraction**: the `ffmpeg` CLI.
-- **File watching**: `watchdog`.
-- **Storage**: SQLite (jobs and run state, at `data/state.db` under the data directory) plus JSON manifest files.
-
-## Directory structure
-
-```text
-.
-├── app/          # Local console: server.py (backend), index.html (frontend), start.sh (launcher), presets/ (vocabulary presets)
-├── src/          # Transcription pipeline (stage1–stage12: watch, transcribe, draft, publish, archive, etc.)
-├── tests/        # Self-test scripts
-├── docs/         # Usage, troubleshooting, screenshots, plus pm/review/qa/handoff development records
-├── windows/      # Windows 11 port (in development, unreleased, pending real-machine verification; see windows/README.md)
-└── scripts/      # Development orchestration helper scripts
-```
-
-Regular users only need `app/` plus `docs/usage.md` and `docs/troubleshooting.md`.
-
-## Documentation
-
-- [Usage](./docs/usage.md)
-- [Troubleshooting](./docs/troubleshooting.md)
-
-`docs/pm/`, `docs/review/`, `docs/qa/`, and `docs/handoff/` hold development plans, reviews, test reports, and handoffs. Regular users can ignore them.
+- Transcription happens on-device; neither audio nor text leaves the machine.
+- The console listens on loopback only, so other devices on the LAN cannot reach it by default.
+- The repository, tests, and examples contain no real videos, notes, or client information.
 
 ## Known limitations
 
-- The target device is Apple Silicon Mac. A Windows 11 port is developed separately under `windows/` (**in development, unreleased**, pending real-machine verification); see [windows/README.md](./windows/README.md).
-- Without `mlx_whisper` or `ffmpeg`, transcription is unavailable; the console reports it explicitly. Besides `mlx-whisper`, `watchdog` is also required (this repository ships no dependency manifest).
-- Watch state is lost on restart; press start again in the page after the service restarts.
-- Long real-world videos are still under acceptance testing. The pipeline guarantees it keeps running, not word-level accuracy.
-- **A video dropped into the watched folder is only picked up after it stops changing (about 7 seconds of quiet writes).** If a copy/download pauses for longer than ~7 seconds and then continues, a partial transcript may be produced first, while the complete version is blocked by No-Clobber protection (existing notes are never overwritten). In that case, delete the partial `.md` and drop the video again.
-- There is no License file in the repository. Treat it as all rights reserved until a license is added.
+- Apple Silicon only (it depends on `mlx_whisper`); the `windows/` directory is a separate implementation line.
+- Runtime and memory for long videos lack a complete baseline; try a small batch before scaling up.
+- If a source file is moved or deleted, the task stops at "source path missing" and needs manual re-binding.
 
-## License
+## Layout
 
-No License file is provided yet. Add one before public distribution and link it here.
+```text
+app/            # local console page and Python server (stdlib only)
+src/stage1..10  # pipeline stages: discover, extract, transcribe, compose, write
+tests/          # pipeline and state-machine tests
+docs/           # plans, reviews, QA, handoff, governance
+```
+
+See `docs/pm/PRODUCT_PLAN.md` for scope and current state, and `docs/review/RESEARCH_REVIEW.md` for technical review.
